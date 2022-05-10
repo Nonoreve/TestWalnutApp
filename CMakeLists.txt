@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(walnutApp)
+project(Pong)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -9,7 +9,7 @@ set(EXTERNAL ON)
 # add_compile_definitions("NDEBUG")
 
 add_subdirectory(Walnut)
-add_subdirectory(WalnutApp)
+add_subdirectory(Pong)
 
 # will create compile commands link in the root of the project
 # for clangd or whatever
