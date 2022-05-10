@@ -1,0 +1,4 @@
+[submodule "Walnut"]
+	path = Walnut
+	branch = origin/linux
+	url = https://github.com/Nonoreve/Walnut
