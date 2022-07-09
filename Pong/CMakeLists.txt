@@ -4,6 +4,6 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${CMAKE_PROJECT_NAME}
         src/Pong.cpp
-)
+        src/Renderer.cpp)
 
 target_link_libraries(${CMAKE_PROJECT_NAME} walnut)

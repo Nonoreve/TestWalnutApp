@@ -7,12 +7,13 @@
 #include "Walnut/EntryPoint.h"
 
 #include "Walnut/Image.h"
-#include "Walnut/Random.h"
 #include "Walnut/Timer.h"
 
-using namespace Walnut;
+#include "Renderer.hpp"
 
 #include <iostream>
+
+using namespace Walnut;
 
 class PongLayer : public Walnut::Layer {
 public:
@@ -27,11 +28,13 @@ public:
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Viewport");
 
-		m_ViewportWidth = (uint32_t) ImGui::GetContentRegionAvail().x - 1;
-		m_ViewportHeight = (uint32_t) ImGui::GetContentRegionAvail().y - 1;
+		m_ViewportWidth = (uint32_t) ImGui::GetContentRegionAvail().x;// - 1;
+		m_ViewportHeight = (uint32_t) ImGui::GetContentRegionAvail().y;// - 1;
 
-		if (m_Image)
-			ImGui::Image(m_Image->GetDescriptorSet(), {(float) m_Image->GetWidth(), (float) m_Image->GetHeight()});
+		auto image = m_Renderer.GetFinalImage();
+		if (image)
+			ImGui::Image(image->GetDescriptorSet(), {(float) image->GetWidth(), (float) image->GetHeight()},
+			             ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -41,7 +44,7 @@ public:
 
 	void Render() {
 		Timer timer;
-
+/*
 		if (!m_Image || m_ViewportWidth != m_Image->GetWidth() || m_ViewportHeight != m_Image->GetHeight()) {
 			m_Image = std::make_shared<Image>(m_ViewportWidth, m_ViewportHeight, ImageFormat::RGBA);
 			delete[] m_ImageData;
@@ -112,13 +115,14 @@ public:
 			}
 		}
 
-		m_Image->SetData(m_ImageData);
+		m_Image->SetData(m_ImageData);*/
+		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
+		m_Renderer.Render();
 		m_LastRenderTime = timer.ElapsedMillis();
 	}
 
 private:
-	std::shared_ptr<Image> m_Image;
-	uint32_t *m_ImageData = nullptr;
+	Renderer m_Renderer;
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	float m_LastRenderTime = 0.0f;
