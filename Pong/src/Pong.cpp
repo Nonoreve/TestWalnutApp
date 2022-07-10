@@ -17,11 +17,16 @@ using namespace Walnut;
 
 class PongLayer : public Walnut::Layer {
 public:
+
+	PongLayer() : m_LeftPad(-1.2, 0), m_RightPad(1.2, 0) {}
 	void OnUIRender() override {
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.1fms (%.1f FPS)", m_LastRenderTime, 1 / m_LastRenderTime * 1000);
-		if (ImGui::Button("Render")) {
-			Render();
+		if (ImGui::Button("Up") && m_RightPad.y < 0.7f) {
+			m_RightPad.y += 0.04f;
+		}
+		if (ImGui::Button("Down") && m_RightPad.y > -0.7f) {
+			m_RightPad.y -= 0.04f;
 		}
 		ImGui::End();
 
@@ -46,7 +51,7 @@ public:
 		Timer timer;
 
 		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
-		m_Renderer.Render();
+		m_Renderer.Render(m_LeftPad, m_RightPad);
 		m_LastRenderTime = timer.ElapsedMillis();
 	}
 
@@ -55,12 +60,18 @@ private:
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	float m_LastRenderTime = 0.0f;
+
+	// game specific stuff TODO move to other class
+	vec2 m_LeftPad;
+	vec2 m_RightPad;
 };
 
 
 Walnut::Application *Walnut::CreateApplication(int argc, char **argv) {
 	Walnut::ApplicationSpecification spec;
 	spec.Name = "Pong";
+	spec.Width = 1000;
+	spec.Height = 562;
 
 	auto *app = new Walnut::Application(spec);
 	app->PushLayer<PongLayer>();

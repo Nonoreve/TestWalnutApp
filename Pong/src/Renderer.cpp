@@ -22,31 +22,43 @@ void Renderer::OnResize(uint32_t width, uint32_t height) {
 	m_ImageData = new uint32_t[width * height];
 }
 
-void Renderer::Render() {
+void Renderer::Render(vec2 leftPad, vec2 rightPad) {
+	auto aspectRatio = (float) m_FinalImage->GetWidth() / (float) m_FinalImage->GetHeight();
 	for (uint32_t y = 0; y < m_FinalImage->GetHeight(); y++) {
 		for (uint32_t x = 0; x < m_FinalImage->GetWidth(); x++) {
-			glm::vec2 coord = {(float) x / (float) m_FinalImage->GetWidth(),
-			                   (float) y / (float) m_FinalImage->GetHeight()};
-			coord = coord * 2.0f - 1.0f; // -1 -> 1
-			m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(coord);
+			vec2 coord = {(float) x / (float) m_FinalImage->GetWidth(),
+			              (float) y / (float) m_FinalImage->GetHeight()};
+			// y coords are from -1 to 1, x coords are scaled according to the aspect ratio
+			vec2 normalisedCoord = {coord.x * 2.0f * aspectRatio - aspectRatio, coord.y * 2.0f - 1.0f};
+			m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(normalisedCoord, leftPad, rightPad);
 		}
 	}
 
 	m_FinalImage->SetData(m_ImageData);
 }
 
-uint32_t Renderer::PerPixel(glm::vec2 coord) {
-	glm::vec3 rayOrigin(0.0f, 0.0f, 2.0f);
-	glm::vec3 rayDirection(coord.x, coord.y, -1.0f);
-	float radius = 0.5f;
+uint32_t Renderer::PerPixel(vec2 coord, vec2 leftPad, vec2 rightPad) {
+	vec2 padSize = {0.07f, 0.2f};
 
-	float a = glm::dot(rayDirection, rayDirection);
-	float b = 2.0f * glm::dot(rayOrigin, rayDirection);
-	float c = glm::dot(rayOrigin, rayOrigin) - radius * radius;
+	// m_LeftPad
+	if (coord.x > leftPad.x - padSize.x && coord.x < leftPad.x + padSize.x && coord.y > leftPad.y - padSize.y &&
+	    coord.y < leftPad.y + padSize.y)
+		return 0xff808080;
 
-	float discriminant = b * b - 4.0f * a * c;
-	if (discriminant >= 0.0f)
-		return 0xffff00ff;
+	// m_RightPad
+	if (coord.x > rightPad.x - padSize.x && coord.x < rightPad.x + padSize.x && coord.y > rightPad.y - padSize.y &&
+	    coord.y < rightPad.y + padSize.y)
+		return 0xff808080;
 
-	return 0xff000000;
+	// middle line
+	auto lineThickness = 0.008f;
+	if (coord.x > -lineThickness && coord.x < lineThickness)
+		return 0xff505050;
+
+	// borders
+	auto border = 1.3f;
+	if (coord.x < -border || coord.x > border)
+		return 0xff505050;
+
+	return 0xff000010;
 }
