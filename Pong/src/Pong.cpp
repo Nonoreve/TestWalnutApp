@@ -33,8 +33,8 @@ public:
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Viewport");
 
-		m_ViewportWidth = (uint32_t) ImGui::GetContentRegionAvail().x - 1;
-		m_ViewportHeight = (uint32_t) ImGui::GetContentRegionAvail().y - 1;
+		m_ViewportWidth = (uint32_t) ImGui::GetContentRegionAvail().x;
+		m_ViewportHeight = (uint32_t) ImGui::GetContentRegionAvail().y;
 
 		auto image = m_Renderer.GetFinalImage();
 		if (image)
